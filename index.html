@@ -11,6 +11,10 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/vuetify@3.5.11/dist/vuetify.min.css"
     />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css"
+      rel="stylesheet"
+    />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -28,10 +32,10 @@
 
     <style>
       #app {
-        font-family: "Inter", sans-serif;
+        font-family: 'Inter', sans-serif;
       }
       .sigmar-one-regular {
-        font-family: "Sigmar One", sans-serif;
+        font-family: 'Sigmar One', sans-serif;
         font-weight: 400;
         font-style: normal;
       }
@@ -39,35 +43,109 @@
   </head>
   <body>
     <div id="app">
-      <v-app>
-        <v-app-bar>
-          <v-toolbar-title>
-            <h1 class="sigmar-one-regular">Port Louis</h1>
-          </v-toolbar-title>
-          <v-toolbar-items>
-            <v-btn color="black" @click="adicionarContato"
-              >Adicionar Contato!</v-btn
-            >
-          </v-toolbar-items>
+      <v-app theme="dark">
+        <v-app-bar flat class="border-b" title="Port Louis">
+          <v-dialog max-width="600" v-model="dialog">
+            <template v-slot:activator="{ props: activatorProps }">
+              <v-btn v-bind="activatorProps" icon="mdi-plus"></v-btn>
+            </template>
+            <v-card prepend-icon="mdi-account" title="Adicionar Usuário">
+              <v-card-text>
+                <v-row dense>
+                  <v-col>
+                    <v-text-field
+                      hint="Mínimo de 2 palavras de 3 letras cada"
+                      label="Nome"
+                      v-model="nome"
+                      required
+                      :rules="validaNome"
+                    ></v-text-field>
+                  </v-col>
+                  <v-col>
+                    <v-text-field
+                      label="Telefone"
+                      v-model="telefone"
+                      required
+                      :rules="validaTelefone"
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+              </v-card-text>
+              <v-divider></v-divider>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="red-darken-1"
+                  text="fechar"
+                  variant="tonal"
+                  @click="dialog = false"
+                ></v-btn>
+                <v-btn
+                  color="indigo-lighten-3"
+                  text="salvar"
+                  variant="tonal"
+                  :disabled="!nome || !telefone"
+                  @click="salvarContato"
+                ></v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
         </v-app-bar>
+        <v-main> </v-main>
       </v-app>
     </div>
   </body>
   <script>
-    const { createApp, ref } = Vue;
-    const { createVuetify } = Vuetify;
+    const { createApp, ref } = Vue
+    const { createVuetify } = Vuetify
 
-    const vuetify = createVuetify();
+    const vuetify = createVuetify()
 
     createApp({
       setup() {
-        const message = ref("Hello World!");
+        const dialog = ref(false)
+        const nome = ref('')
+        const telefone = ref('')
+
+        const validaNome = () => {
+          const palavra = nome.value.trim().split(' ')
+          if (palavra.length < 2 || palavra.some((word) => palavra.length < 3)) {
+            showError('O nome deve conter no mínimo duas palavras de no mínimo 3 letras cada.')
+            return false
+          }
+          return true
+        }
+
+        const validaTelefone = () => {
+          const telefoneRegex = /^\(\d{2}\) \d{4}-\d{4}$/
+          if (!telefoneRegex.test(telefone.value)) {
+            showError('Formato de telefone inválido. Use (xx) xxxx-xxxx.')
+            return false
+          }
+          return true
+        }
+
+        const showError = (message) => {
+          alert(message)
+        }
+
+        const salvarContato = () => {
+          if (validaNome() && validaTelefone()) {
+            dialog = false
+          }
+        }
+
         return {
-          message,
-        };
+          dialog,
+          nome,
+          telefone,
+          salvarContato,
+          validaTelefone,
+          validaNome,
+        }
       },
     })
       .use(vuetify)
-      .mount("#app");
+      .mount('#app')
   </script>
 </html>
