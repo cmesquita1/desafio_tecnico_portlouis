@@ -32,7 +32,7 @@
 
     <style>
       #app {
-        font-family: 'Inter', sans-serif;
+        font-family: "Inter", sans-serif;
       }
     </style>
   </head>
@@ -93,43 +93,113 @@
             </v-card>
           </v-dialog>
         </v-app-bar>
-        <v-main> </v-main>
+        <v-main>
+          <v-container>
+            <div class="d-flex justify-center">CONTATOS</div>
+            <v-divider></v-divider>
+            <v-data-table
+              :items="contatos"
+              :item-key="nome"
+              :headers="headers"
+            >
+            <template v-slot:item.acao="{ item }">
+              <v-icon class="me-2" size="small" @click="editarContato(item)">mdi-pencil</v-icon>
+              <v-icon size="small" @click="deletarContato(item)">mdi-delete</v-icon>
+            </template>
+            </v-data-table>
+          </v-container>
+        </v-main>
       </v-app>
     </div>
   </body>
   <script>
-    const { createApp, ref } = Vue
-    const { createVuetify } = Vuetify
+    const { createApp, ref } = Vue;
+    const { createVuetify } = Vuetify;
 
-    const vuetify = createVuetify()
+    const vuetify = createVuetify();
 
     createApp({
       setup() {
-        const dialog = ref(false)
-        const nome = ref('')
-        const telefone = ref('')
+        const dialog = ref(false);
+        const nome = ref("");
+        const telefone = ref("");
+
+        const headers = [
+          {
+            title: "Nome",
+            align: "start",
+            key: "nome"
+          },
+          {
+            title: "Telefone",
+            key: "telefone"
+          },
+          {
+            title: "",
+            key: "acao",
+            sortable: false
+          }
+        ]
+
+        const contatos = ref([
+          {
+            nome: "Carlos Mesquita",
+            telefone: "(11) 8230-3693",
+          },
+          {
+            nome: "John Doe",
+            telefone: "(91) 8755-7027",
+          },
+          {
+            nome: "Clara Silva",
+            telefone: "(95) 9234-5966",
+          },
+        ]);
+
 
         const validaNome = () => {
-          const palavra = nome.value.trim().split(' ')
+          const palavra = nome.value.trim().split(" ");
           if (palavra.length < 2 || palavra.some((word) => word.length < 3)) {
-            return false
+            return false;
           }
-          return true
-        }
+          return true;
+        };
 
         const validaTelefone = () => {
-          const telefoneRegex = /^\(\d{2}\) \d{4}-\d{4}$/
+          const telefoneRegex = /^\(\d{2}\) \d{4}-\d{4}$/;
           if (!telefoneRegex.test(telefone.value)) {
-            return false
+            return false;
           }
-          return true
-        }
+          return true;
+        };
 
         const salvarContato = () => {
           if (validaNome() && validaTelefone()) {
-            dialog = false
+            contatos.push({
+              nome: nome._value,
+              telefone: telefone._value
+            })
+            dialog = false;
+            nome.value = "";
+            telefone.value = "";
           }
+        };
+
+        const editarContato = (item) => {
+          this.editedIndex = this.contatos.idexOf(item)
+          this.editedItem = Object.assign({}, item)
+          this.dialog = true
         }
+
+        const deletarContato = (item) => {
+          this.editedIndex = this.contatos.indexOf(item)
+          this.editedItem = Object.assign({}, item)
+          this.dialogDelete = true
+        }
+
+        // const checkDDD = (row) => {
+        //   return row.telefone.includes("(11)");
+        // };
 
         return {
           dialog,
@@ -138,10 +208,23 @@
           salvarContato,
           validaTelefone,
           validaNome,
-        }
+          // checkDDD,
+          editarContato,
+          deletarContato,
+          contatos,
+          headers,
+          editarContato,
+          deletarContato
+        };
       },
     })
       .use(vuetify)
-      .mount('#app')
+      .mount("#app");
   </script>
+
+  <style scoped>
+    .blue-row {
+      background-color: lightblue !important;
+    }
+  </style>
 </html>

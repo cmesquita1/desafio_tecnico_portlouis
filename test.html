@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/maska@2/dist/maska.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vuetify@3.5.11/dist/vuetify.min.js"></script>
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/vuetify@3.5.11/dist/vuetify.min.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css"
+      rel="stylesheet"
+    />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="app">
+      <v-app theme="dark">
+        <v-toolbar flat>
+          <v-toolbar-title>Meus Contatos</v-toolbar-title>
+          <v-divider class="mx-2" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+          <v-dialog v-model="dialog" max-width="500px">
+            <template v-slot:activator="{ props }">
+              <v-btn class="mx-4" dark variant="tonal" v-bind="props"
+                >adicionar</v-btn
+              >
+            </template>
+            <v-card>
+              <v-card-title>
+                <span class="text-h5">{{ formTitle }}</span>
+              </v-card-title>
+              <v-card-text>
+                <v-container>
+                  <v-row>
+                    <v-col cols="12" md="4" sm="6">
+                      <v-text-field
+                        v-model="nome"
+                        label="Nome"
+                        required
+                        variant="underlined"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col cols="12" md="4" sm="6">
+                      <v-text-field
+                        v-model="telefone"
+                        label="Telefone"
+                        required
+                        variant="underlined"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-container>
+              </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="red-darken-1"
+                  variant="text"
+                  @click="dialog = false"
+                  >fechar</v-btn
+                >
+                <v-btn
+                  color="blue-darken-1"
+                  variant="text"
+                  :disabled="!validaNome() || !validaTelefone()"
+                  @click="adicionar"
+                >
+                  adicionar
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-dialog>
+        </v-toolbar>
+        <v-data-table
+          :items="contatos"
+          :item-key="nome"
+          :headers="headers"
+          width="600px"
+        >
+          <template v-slot:item.acao="{ item }">
+            <v-icon class="me-2" size="small" @click="console.log(item)"
+              >mdi-pencil</v-icon
+            >
+            <v-icon size="small" @click="deletaContato(item)"
+              >mdi-delete</v-icon
+            >
+          </template>
+        </v-data-table>
+      </v-app>
+    </div>
+  </body>
+
+  <script>
+    const { createApp, ref } = Vue;
+    const { createVuetify } = Vuetify;
+
+    const vuetify = createVuetify();
+
+    createApp({
+      setup() {
+        const dialog = ref(false);
+        const headers = [
+          {
+            title: "Nome",
+            align: "start",
+            key: "nome",
+          },
+          {
+            title: "Telefone",
+            key: "telefone",
+            sortable: false,
+          },
+          {
+            title: "",
+            key: "acao",
+            sortable: false,
+          },
+        ];
+
+        const contatos = ref([
+          {
+            nome: "Carlos Mesquita",
+            telefone: "(11) 8230-3693",
+          },
+          {
+            nome: "John Doe",
+            telefone: "(91) 8755-7027",
+          },
+          {
+            nome: "Clara Silva",
+            telefone: "(95) 9234-5966",
+          },
+        ]);
+
+        const nome = ref("");
+        const telefone = ref("");
+
+        function adicionar() {
+          contatos.value.push({
+            nome: nome.value,
+            telefone: telefone.value,
+          });
+          nome.value = "";
+          telefone.value = "";
+        }
+
+        function validaNome() {
+          const palavras = nome.value.trim().split(" ");
+          if (
+            palavras.length < 2 ||
+            palavras.some((palavra) => palavra.length < 3)
+          ) {
+            return false;
+          }
+          return true;
+        }
+
+        function validaTelefone() {
+          return telefone.value.length == 10;
+        }
+
+        function deletaContato(pessoa) {
+          const index = contatos.value.findIndex(
+            (item) =>
+              item.nome === pessoa.nome && item.telefone === pessoa.telefone
+          );
+          if (index !== -1) {
+            contatos.value.splice(index, 1);
+          }
+        }
+
+        return {
+          headers,
+          contatos,
+          dialog,
+          nome,
+          telefone,
+          adicionar,
+          validaNome,
+          validaTelefone,
+          deletaContato,
+        };
+      },
+    })
+      .use(vuetify)
+      .mount("#app");
+  </script>
+
+  <style>
+    #app {
+      font-family: "Poppins", sans-serif;
+    }
+  </style>
+</html>
