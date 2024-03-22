@@ -31,12 +31,12 @@
             </template>
             <v-card>
               <v-card-title>
-                <span class="text-h5">{{ formTitle }}</span>
+                <span class="text-h5">Adicionar novo contato</span>
               </v-card-title>
               <v-card-text>
                 <v-container>
                   <v-row>
-                    <v-col cols="12" md="4" sm="6">
+                    <v-col>
                       <v-text-field
                         v-model="nome"
                         label="Nome"
@@ -44,7 +44,7 @@
                         variant="underlined"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" md="4" sm="6">
+                    <v-col>
                       <v-text-field
                         v-model="telefone"
                         label="Telefone"
@@ -80,15 +80,36 @@
           :items="contatos"
           :item-key="nome"
           :headers="headers"
-          width="600px"
+          style="height: 100%"
         >
           <template v-slot:item.acao="{ item }">
-            <v-icon class="me-2" size="small" @click="console.log(item)"
+            <v-icon class="me-2" size="small" @click="editaContato(item)"
               >mdi-pencil</v-icon
             >
             <v-icon size="small" @click="deletaContato(item)"
               >mdi-delete</v-icon
             >
+            <v-dialog v-model="dialogEdicao" max-width="500px">
+              <v-card>
+                <v-card-title>Editar contato</v-card-title>
+                <v-card-text>
+                  <v-text-field
+                    v-model="contatoEditado.nome"
+                    label="Nome"
+                  ></v-text-field>
+                  <v-text-field
+                    v-model="contatoEditado.telefone"
+                    label="Telefone"
+                  ></v-text-field>
+                </v-card-text>
+                <v-card-actions>
+                  <v-btn color="success" @click="salvarContato"
+                    >Salvar Contato</v-btn
+                  >
+                  <v-btn color="red" @click="dialogEdicao = false">Fechar</v-btn>
+                </v-card-actions>
+              </v-card>
+            </v-dialog>
           </template>
         </v-data-table>
       </v-app>
@@ -104,21 +125,29 @@
     createApp({
       setup() {
         const dialog = ref(false);
+        const dialogEdicao = ref(false);
+        const contatoEditado = ref({});
         const headers = [
           {
             title: "Nome",
             align: "start",
             key: "nome",
+            align: "center",
+            width: "30%",
           },
           {
             title: "Telefone",
             key: "telefone",
+            align: "center",
             sortable: false,
+            width: "30%",
           },
           {
             title: "",
             key: "acao",
             sortable: false,
+            align: "center",
+            width: "20%",
           },
         ];
 
@@ -174,16 +203,38 @@
           }
         }
 
+        function editaContato(pessoa) {
+          contatoEditado.value =  { ...pessoa };
+          dialogEdicao.value = true;
+        }
+
+
+        function salvarContato() {
+          const index = contatos.value.findIndex(
+            (item) =>
+              item.nome === contatoEditado.nome &&
+              item.telefone === contatoEditado.telefone
+          );
+          if (index !== -1) {
+            contatos.value[index].nome = contatoEditado.nome;
+            contatos.value[index].telefone = contatoEditado.telefone;
+          }
+          dialogEdicao = false;
+        }
+
         return {
           headers,
           contatos,
           dialog,
+          dialogEdicao,
           nome,
           telefone,
           adicionar,
           validaNome,
           validaTelefone,
           deletaContato,
+          editaContato,
+          contatoEditado,
         };
       },
     })
@@ -192,7 +243,7 @@
   </script>
 
   <style>
-    #app {
+    * {
       font-family: "Poppins", sans-serif;
     }
   </style>
