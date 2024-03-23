@@ -68,7 +68,7 @@
                   color="blue-darken-1"
                   variant="text"
                   :disabled="!validaNome() || !validaTelefone()"
-                  @click="adicionar"
+                  @click="adicionarContato"
                 >
                   adicionar
                 </v-btn>
@@ -82,34 +82,42 @@
           :headers="headers"
           style="height: 100%"
         >
-          <template v-slot:item.acao="{ item }">
-            <v-icon class="me-2" size="small" @click="editaContato(item)"
-              >mdi-pencil</v-icon
-            >
-            <v-icon size="small" @click="deletaContato(item)"
-              >mdi-delete</v-icon
-            >
-            <v-dialog v-model="dialogEdicao" max-width="500px">
-              <v-card>
-                <v-card-title>Editar contato</v-card-title>
-                <v-card-text>
-                  <v-text-field
-                    v-model="contatoEditado.nome"
-                    label="Nome"
-                  ></v-text-field>
-                  <v-text-field
-                    v-model="contatoEditado.telefone"
-                    label="Telefone"
-                  ></v-text-field>
-                </v-card-text>
-                <v-card-actions>
-                  <v-btn color="success" @click="salvarContato"
-                    >Salvar Contato</v-btn
-                  >
-                  <v-btn color="red" @click="dialogEdicao = false">Fechar</v-btn>
-                </v-card-actions>
-              </v-card>
-            </v-dialog>
+          <template v-slot:item="{ item }">
+            <tr :class="{'blue-row': item.telefone.includes('(11)')}">
+              <td>{{ item.nome }}</td>
+              <td>{{ item.telefone }}</td>
+              <td>
+                <v-icon class="me-2" size="small" @click="editaContato(item)"
+                  >mdi-pencil</v-icon
+                >
+                <v-icon size="small" @click="deletaContato(item)"
+                  >mdi-delete</v-icon
+                >
+                <v-dialog v-model="dialogEdicao" max-width="500px">
+                  <v-card>
+                    <v-card-title>Editar contato</v-card-title>
+                    <v-card-text>
+                      <v-text-field
+                        v-model="contatoEditado.nome"
+                        label="Nome"
+                      ></v-text-field>
+                      <v-text-field
+                        v-model="contatoEditado.telefone"
+                        label="Telefone"
+                      ></v-text-field>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-btn color="success" @click="salvarContato"
+                        >Salvar Contato</v-btn
+                      >
+                      <v-btn color="red" @click="dialogEdicao = false"
+                        >Fechar</v-btn
+                      >
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+              </td>
+            </tr>
           </template>
         </v-data-table>
       </v-app>
@@ -164,18 +172,27 @@
             nome: "Clara Silva",
             telefone: "(95) 9234-5966",
           },
+          {
+            nome: "Lucas Costa",
+            telefone: "(11) 9234-5966",
+          },
         ]);
 
         const nome = ref("");
         const telefone = ref("");
 
-        function adicionar() {
+        function adicionarContato() {
+          const telefoneFormatado = `(${telefone.value.slice(
+            0,
+            2
+          )}) ${telefone.value.slice(2, 6)}-${telefone.value.slice(6)}`;
           contatos.value.push({
             nome: nome.value,
-            telefone: telefone.value,
+            telefone: telefoneFormatado,
           });
           nome.value = "";
           telefone.value = "";
+          dialog.value = false;
         }
 
         function validaNome() {
@@ -204,10 +221,9 @@
         }
 
         function editaContato(pessoa) {
-          contatoEditado.value =  { ...pessoa };
+          contatoEditado.value = { ...pessoa };
           dialogEdicao.value = true;
         }
-
 
         function salvarContato() {
           const index = contatos.value.findIndex(
@@ -229,7 +245,7 @@
           dialogEdicao,
           nome,
           telefone,
-          adicionar,
+          adicionarContato,
           validaNome,
           validaTelefone,
           deletaContato,
@@ -245,6 +261,9 @@
   <style>
     * {
       font-family: "Poppins", sans-serif;
+    }
+    .blue-row {
+      background: rgb(16, 135, 195);
     }
   </style>
 </html>
