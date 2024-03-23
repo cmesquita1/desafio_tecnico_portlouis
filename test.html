@@ -42,6 +42,8 @@
                         label="Nome"
                         required
                         variant="underlined"
+                        :color="validaNome() ? '' : 'red-darken-1'"
+                        :hint="validaNome() ? '' : 'Mínimo de 2 palavras de 3 letras cada'"
                       ></v-text-field>
                     </v-col>
                     <v-col>
@@ -50,6 +52,8 @@
                         label="Telefone"
                         required
                         variant="underlined"
+                        :color="validaTelefone() ? '' : 'red-darken-1'"
+                        :hint="validaTelefone() ? '' : 'Formato de telefone inválido. Use (xx) xxxx-xxxx'"
                       ></v-text-field>
                     </v-col>
                   </v-row>
@@ -107,7 +111,9 @@
                       ></v-text-field>
                     </v-card-text>
                     <v-card-actions>
-                      <v-btn color="success" @click="salvarContato"
+                      <v-btn
+                        color="success"
+                        @click="salvarContatoEditado(contatoEditado)"
                         >Salvar Contato</v-btn
                       >
                       <v-btn color="red" @click="dialogEdicao = false"
@@ -225,17 +231,13 @@
           dialogEdicao.value = true;
         }
 
-        function salvarContato() {
+        function salvarContatoEditado(contatoEditado) {
           const index = contatos.value.findIndex(
-            (item) =>
-              item.nome === contatoEditado.nome &&
-              item.telefone === contatoEditado.telefone
+            (contato) =>
+              contato.nome === contatoEditado.nome &&
+              contato.telefone === contatoEditado.telefone
           );
-          if (index !== -1) {
-            contatos.value[index].nome = contatoEditado.nome;
-            contatos.value[index].telefone = contatoEditado.telefone;
-          }
-          dialogEdicao = false;
+          dialogEdicao.value = false;
         }
 
         return {
@@ -245,12 +247,13 @@
           dialogEdicao,
           nome,
           telefone,
+          contatoEditado,
           adicionarContato,
           validaNome,
           validaTelefone,
           deletaContato,
           editaContato,
-          contatoEditado,
+          salvarContatoEditado,
         };
       },
     })
