@@ -3,9 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Desafio Técnico Port Louis</title>
-
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/maska@2/dist/maska.umd.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@3.5.11/dist/vuetify.min.js"></script>
     <link
       rel="stylesheet"
@@ -15,103 +14,138 @@
       href="https://cdn.jsdelivr.net/npm/@mdi/font@5.x/css/materialdesignicons.min.css"
       rel="stylesheet"
     />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap"
-      rel="stylesheet"
-    />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Sigmar+One&display=swap"
-      rel="stylesheet"
-    />
-
-    <style>
-      #app {
-        font-family: "Inter", sans-serif;
-      }
-    </style>
+    <title>Document</title>
   </head>
   <body>
     <div id="app">
       <v-app theme="dark">
-        <v-app-bar flat class="border-b" title="Port Louis">
-          <v-dialog max-width="600" v-model="dialog">
-            <template v-slot:activator="{ props: activatorProps }">
-              <v-btn v-bind="activatorProps" icon="mdi-plus"></v-btn>
+        <v-toolbar flat>
+          <v-toolbar-title>Meus Contatos</v-toolbar-title>
+          <v-divider class="mx-2" inset vertical></v-divider>
+          <v-spacer></v-spacer>
+          <v-dialog v-model="dialog" max-width="500px">
+            <template v-slot:activator="{ props }">
+              <v-btn class="mx-4" dark variant="tonal" v-bind="props"
+                >adicionar</v-btn
+              >
             </template>
-            <v-card prepend-icon="mdi-account" title="Adicionar Usuário">
+            <v-card>
+              <v-card-title>
+                <span class="text-h5">Adicionar novo contato</span>
+              </v-card-title>
               <v-card-text>
-                <v-row dense>
-                  <v-col>
-                    <v-text-field
-                      variant="underlined"
-                      :color="validaNome() ? '' : 'red-darken-1'"
-                      :hint="validaNome() ? '' : 'Mínimo de 2 palavras de 3 letras cada'"
-                      prepend-icon="mdi-star"
-                      label="Nome"
-                      v-model="nome"
-                      required
-                      :rules="validaNome"
-                    ></v-text-field>
-                  </v-col>
-                  <v-col>
-                    <v-text-field
-                      variant="underlined"
-                      :color="validaTelefone() ? '' : 'red-darken-1'"
-                      :hint="validaTelefone() ? '' : 'Formato de telefone inválido. Use (xx) xxxx-xxxx'"
-                      prepend-icon="mdi-paperclip"
-                      label="Telefone"
-                      v-model="telefone"
-                      required
-                      :rules="validaTelefone"
-                    ></v-text-field>
-                  </v-col>
-                </v-row>
+                <v-container>
+                  <v-row>
+                    <v-col>
+                      <v-text-field
+                        v-model="nome"
+                        label="Nome"
+                        required
+                        variant="underlined"
+                        :color="validaNome() ? '' : 'red-darken-1'"
+                        :hint="validaNome() ? '' : 'Mínimo de 2 palavras de 3 letras cada'"
+                      ></v-text-field>
+                    </v-col>
+                    <v-col>
+                      <v-text-field
+                        v-model="telefone"
+                        label="Telefone"
+                        required
+                        variant="underlined"
+                        :color="validaTelefone() ? '' : 'red-darken-1'"
+                        :hint="validaTelefone() ? '' : 'Formato de telefone inválido. Use (xx) xxxx-xxxx'"
+                      ></v-text-field>
+                    </v-col>
+                  </v-row>
+                </v-container>
               </v-card-text>
-              <v-divider></v-divider>
+
               <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
                   color="red-darken-1"
-                  text="fechar"
-                  variant="tonal"
+                  variant="text"
                   @click="dialog = false"
-                ></v-btn>
+                  >fechar</v-btn
+                >
                 <v-btn
-                  color="indigo-lighten-3"
-                  text="salvar"
-                  variant="tonal"
+                  color="blue-darken-1"
+                  variant="text"
                   :disabled="!validaNome() || !validaTelefone()"
-                  @click="salvarContato"
-                ></v-btn>
+                  @click="adicionarContato"
+                >
+                  adicionar
+                </v-btn>
               </v-card-actions>
             </v-card>
           </v-dialog>
-        </v-app-bar>
-        <v-main>
-          <v-container>
-            <div class="d-flex justify-center">CONTATOS</div>
-            <v-divider></v-divider>
-            <v-data-table
-              :items="contatos"
-              :item-key="nome"
-              :headers="headers"
-            >
-            <template v-slot:item.acao="{ item }">
-              <v-icon class="me-2" size="small" @click="editarContato(item)">mdi-pencil</v-icon>
-              <v-icon size="small" @click="deletarContato(item)">mdi-delete</v-icon>
-            </template>
-            </v-data-table>
-          </v-container>
-        </v-main>
+        </v-toolbar>
+        <v-data-table
+          :items="contatos"
+          :item-key="nome"
+          :headers="headers"
+          style="height: 100%"
+        >
+          <template v-slot:item="{ item }">
+            <tr :class="{'blue-row': item.telefone.includes('(11)')}">
+              <td>{{ item.nome }}</td>
+              <td>{{ item.telefone }}</td>
+              <td>
+                <v-icon class="me-2" size="small" @click="editaContato(item)"
+                  >mdi-pencil</v-icon
+                >
+                <v-dialog v-model="dialogDelete" width="fit-content">
+                  <v-card>
+                    <v-card-title>Confirmar remoção de contato?</v-card-title>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="red" @click="dialogDelete=false"
+                        >Cancelar</v-btn
+                      >
+                      <v-btn
+                        color="success"
+                        @click="deletaContato(removeContato)"
+                        >Confirmar</v-btn
+                      >
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+                <v-icon size="small" @click="opcaoContatoDeletar(item)"
+                  >mdi-delete</v-icon
+                >
+                <v-dialog v-model="dialogEdicao" max-width="500px">
+                  <v-card>
+                    <v-card-title>Editar contato</v-card-title>
+                    <v-card-text>
+                      <v-text-field
+                        v-model="contatoEditado.nome"
+                        label="Nome"
+                      ></v-text-field>
+                      <v-text-field
+                        v-model="contatoEditado.telefone"
+                        label="Telefone"
+                      ></v-text-field>
+                    </v-card-text>
+                    <v-card-actions>
+                      <v-btn
+                        color="success"
+                        @click="salvarContatoEditado(contatoEditado, posicao)"
+                        >Salvar Contato</v-btn
+                      >
+                      <v-btn color="red" @click="dialogEdicao = false"
+                        >Fechar</v-btn
+                      >
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+              </td>
+            </tr>
+          </template>
+        </v-data-table>
       </v-app>
     </div>
   </body>
+
   <script>
     const { createApp, ref } = Vue;
     const { createVuetify } = Vuetify;
@@ -121,25 +155,36 @@
     createApp({
       setup() {
         const dialog = ref(false);
+        const dialogEdicao = ref(false);
+        const dialogDelete = ref(false);
+        const contatoEditado = ref({});
+        const removeContato = ref({});
+        const posicao = ref();
         const nome = ref("");
         const telefone = ref("");
-
         const headers = [
           {
             title: "Nome",
             align: "start",
-            key: "nome"
+            key: "nome",
+            align: "center",
+            width: "30%",
           },
           {
             title: "Telefone",
-            key: "telefone"
+            key: "telefone",
+            align: "center",
+            sortable: false,
+            width: "30%",
           },
           {
             title: "",
             key: "acao",
-            sortable: false
-          }
-        ]
+            sortable: false,
+            align: "center",
+            width: "20%",
+          },
+        ];
 
         const contatos = ref([
           {
@@ -154,67 +199,94 @@
             nome: "Clara Silva",
             telefone: "(95) 9234-5966",
           },
+          {
+            nome: "Lucas Costa",
+            telefone: "(11) 9234-5966",
+          },
         ]);
 
+        function adicionarContato() {
+          const telefoneFormatado = `(${telefone.value.slice(
+            0,
+            2
+          )}) ${telefone.value.slice(2, 6)}-${telefone.value.slice(6)}`;
+          contatos.value.push({
+            nome: nome.value,
+            telefone: telefoneFormatado,
+          });
+          nome.value = "";
+          telefone.value = "";
+          dialog.value = false;
+        }
 
-        const validaNome = () => {
-          const palavra = nome.value.trim().split(" ");
-          if (palavra.length < 2 || palavra.some((word) => word.length < 3)) {
+        function validaNome() {
+          const palavras = nome.value.trim().split(" ");
+          if (
+            palavras.length < 2 ||
+            palavras.some((palavra) => palavra.length < 3)
+          ) {
             return false;
           }
           return true;
-        };
-
-        const validaTelefone = () => {
-          const telefoneRegex = /^\(\d{2}\) \d{4}-\d{4}$/;
-          if (!telefoneRegex.test(telefone.value)) {
-            return false;
-          }
-          return true;
-        };
-
-        const salvarContato = () => {
-          if (validaNome() && validaTelefone()) {
-            contatos.push({
-              nome: nome._value,
-              telefone: telefone._value
-            })
-            dialog = false;
-            nome.value = "";
-            telefone.value = "";
-          }
-        };
-
-        const editarContato = (item) => {
-          this.editedIndex = this.contatos.idexOf(item)
-          this.editedItem = Object.assign({}, item)
-          this.dialog = true
         }
 
-        const deletarContato = (item) => {
-          this.editedIndex = this.contatos.indexOf(item)
-          this.editedItem = Object.assign({}, item)
-          this.dialogDelete = true
+        function validaTelefone() {
+          return telefone.value.length == 10;
         }
 
-        // const checkDDD = (row) => {
-        //   return row.telefone.includes("(11)");
-        // };
+        function opcaoContatoDeletar(pessoa) {
+          removeContato.value = { ...pessoa };
+          dialogDelete.value = true;
+        }
+
+        function deletaContato(removeContato) {
+          const index = contatos.value.findIndex(
+            (item) =>
+              item.nome === removeContato.nome &&
+              item.telefone === removeContato.telefone
+          );
+          if (index !== -1) {
+            contatos.value.splice(index, 1);
+          }
+          dialogDelete.value = false;
+        }
+
+        function editaContato(pessoa) {
+          contatoEditado.value = { ...pessoa };
+          const index = contatos.value.findIndex(
+            (contato) =>
+              contato.nome === contatoEditado.value.nome &&
+              contato.telefone === contatoEditado.value.telefone
+          );
+          posicao.value = index;
+          dialogEdicao.value = true;
+        }
+
+        function salvarContatoEditado(contatoEditado, index) {
+          if (index !== -1) {
+            contatos.value[index] = contatoEditado;
+          }
+          dialogEdicao.value = false;
+        }
 
         return {
+          headers,
+          contatos,
           dialog,
+          dialogEdicao,
+          dialogDelete,
           nome,
           telefone,
-          salvarContato,
-          validaTelefone,
+          contatoEditado,
+          removeContato,
+          posicao,
+          adicionarContato,
           validaNome,
-          // checkDDD,
-          editarContato,
-          deletarContato,
-          contatos,
-          headers,
-          editarContato,
-          deletarContato
+          validaTelefone,
+          deletaContato,
+          editaContato,
+          salvarContatoEditado,
+          opcaoContatoDeletar,
         };
       },
     })
@@ -222,9 +294,12 @@
       .mount("#app");
   </script>
 
-  <style scoped>
+  <style>
+    * {
+      font-family: "Poppins", sans-serif;
+    }
     .blue-row {
-      background-color: lightblue !important;
+      background: rgb(16, 135, 195);
     }
   </style>
 </html>
