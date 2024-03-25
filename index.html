@@ -87,7 +87,7 @@
           :items="contatos"
           :item-key="nome"
           :headers="headers"
-          style="height: 100%"
+          style="height: 100%; max-width: 80%; margin: 0 auto"
         >
           <template v-slot:item="{ item }">
             <tr :class="{'blue-row': item.telefone.includes('(11)')}">
@@ -176,25 +176,23 @@
             title: "Nome",
             align: "start",
             key: "nome",
-            align: "center",
-            width: "30%",
+            width: "40%",
           },
           {
             title: "Telefone",
             key: "telefone",
             align: "center",
             sortable: false,
-            width: "30%",
+            width: "40%",
           },
           {
             title: "",
             key: "acao",
             sortable: false,
-            align: "center",
+            align: "end",
             width: "20%",
           },
         ];
-
         const contatos = ref([
           {
             nome: "Carlos Mesquita",
