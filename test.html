@@ -94,7 +94,19 @@
                 <v-icon class="me-2" size="small" @click="editaContato(item)"
                   >mdi-pencil</v-icon
                 >
-                <v-icon size="small" @click="deletaContato(item)"
+                <v-dialog v-model="dialogDelete" width="fit-content">
+                  <v-card>
+                    <v-card-title>Confirmar remoção de contato?</v-card-title>
+                    <v-card-actions>
+                      <v-spacer></v-spacer>
+                      <v-btn color="red" @click="dialogDelete=false"
+                        >Cancelar</v-btn
+                      >
+                      <v-btn color="success" @click="deletaContato(removeContato)">Confirmar</v-btn>
+                    </v-card-actions>
+                  </v-card>
+                </v-dialog>
+                <v-icon size="small" @click="opcaoContatoDeletar(item)"
                   >mdi-delete</v-icon
                 >
                 <v-dialog v-model="dialogEdicao" max-width="500px">
@@ -140,7 +152,11 @@
       setup() {
         const dialog = ref(false);
         const dialogEdicao = ref(false);
+        const dialogDelete = ref(false);
         const contatoEditado = ref({});
+        const removeContato = ref({});
+        const nome = ref("");
+        const telefone = ref("");
         const headers = [
           {
             title: "Nome",
@@ -184,9 +200,6 @@
           },
         ]);
 
-        const nome = ref("");
-        const telefone = ref("");
-
         function adicionarContato() {
           const telefoneFormatado = `(${telefone.value.slice(
             0,
@@ -216,14 +229,20 @@
           return telefone.value.length == 10;
         }
 
-        function deletaContato(pessoa) {
+        function opcaoContatoDeletar(pessoa) {
+          removeContato.value = { ...pessoa };
+          dialogDelete.value = true;
+        }
+
+        function deletaContato(removeContato) {
           const index = contatos.value.findIndex(
             (item) =>
-              item.nome === pessoa.nome && item.telefone === pessoa.telefone
+              item.nome === removeContato.nome && item.telefone === removeContato.telefone
           );
           if (index !== -1) {
-            contatos.value.splice(index, 1);
+            contatos.value.splice(index, 1)
           }
+          dialogDelete.value = false;
         }
 
         function editaContato(pessoa) {
@@ -245,15 +264,18 @@
           contatos,
           dialog,
           dialogEdicao,
+          dialogDelete,
           nome,
           telefone,
           contatoEditado,
+          removeContato,
           adicionarContato,
           validaNome,
           validaTelefone,
           deletaContato,
           editaContato,
           salvarContatoEditado,
+          opcaoContatoDeletar
         };
       },
     })
