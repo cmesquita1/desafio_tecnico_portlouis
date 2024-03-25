@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@3.5.11/dist/vuetify.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/maska@2/dist/maska.umd.js"></script>
     <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/vuetify@3.5.11/dist/vuetify.min.css"
@@ -53,6 +54,8 @@
                         variant="underlined"
                         :color="validaTelefone() ? '' : 'red-darken-1'"
                         :hint="validaTelefone() ? '' : 'Formato de telefone inválido. Use (xx) xxxx-xxxx'"
+                        v-maska:[options]
+                        v-model="myValue"
                         @keypress="inputNumeros"
                       ></v-text-field>
                     </v-col>
@@ -150,11 +153,14 @@
   <script>
     const { createApp, ref } = Vue;
     const { createVuetify } = Vuetify;
+    const { Mask, MaskInput, vMaska } = Maska;
 
     const vuetify = createVuetify();
 
     createApp({
       setup() {
+        const options = { mask: "(##) ####-####" };
+        const myValue = ref("");
         const dialog = ref(false);
         const dialogEdicao = ref(false);
         const dialogDelete = ref(false);
@@ -207,13 +213,9 @@
         ]);
 
         function adicionarContato() {
-          const telefoneFormatado = `(${telefone.value.slice(
-            0,
-            2
-          )}) ${telefone.value.slice(2, 6)}-${telefone.value.slice(6)}`;
           contatos.value.push({
             nome: nome.value,
-            telefone: telefoneFormatado,
+            telefone: telefone.value,
           });
           nome.value = "";
           telefone.value = "";
@@ -232,7 +234,8 @@
         }
 
         function validaTelefone() {
-          return telefone.value.length == 10;
+          const regexTelefone = /^\(\d{2}\) \d{4}-\d{4}$/;
+          return regexTelefone.test(telefone.value);
         }
 
         function opcaoContatoDeletar(pessoa) {
@@ -272,7 +275,7 @@
 
         function inputNumeros(event) {
           const charCode = event.keyCode;
-          if(charCode < 48 || charCode > 57) {
+          if (charCode < 48 || charCode > 57) {
             event.preventDefault();
           }
         }
@@ -288,6 +291,7 @@
           contatoEditado,
           removeContato,
           posicao,
+          options,
           adicionarContato,
           validaNome,
           validaTelefone,
@@ -298,6 +302,7 @@
           inputNumeros,
         };
       },
+      directives: { maska: vMaska },
     })
       .use(vuetify)
       .mount("#app");
