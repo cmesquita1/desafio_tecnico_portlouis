@@ -127,6 +127,8 @@
                       <v-text-field
                         v-model="contatoEditado.telefone"
                         label="Telefone"
+                        v-maska:[options]
+                        v-model="myValue"
                         @keypress="inputNumeros"
                       ></v-text-field>
                     </v-card-text>
