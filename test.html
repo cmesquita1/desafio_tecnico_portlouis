@@ -102,7 +102,11 @@
                       <v-btn color="red" @click="dialogDelete=false"
                         >Cancelar</v-btn
                       >
-                      <v-btn color="success" @click="deletaContato(removeContato)">Confirmar</v-btn>
+                      <v-btn
+                        color="success"
+                        @click="deletaContato(removeContato)"
+                        >Confirmar</v-btn
+                      >
                     </v-card-actions>
                   </v-card>
                 </v-dialog>
@@ -125,7 +129,7 @@
                     <v-card-actions>
                       <v-btn
                         color="success"
-                        @click="salvarContatoEditado(contatoEditado)"
+                        @click="salvarContatoEditado(contatoEditado, posicao)"
                         >Salvar Contato</v-btn
                       >
                       <v-btn color="red" @click="dialogEdicao = false"
@@ -155,6 +159,7 @@
         const dialogDelete = ref(false);
         const contatoEditado = ref({});
         const removeContato = ref({});
+        const posicao = ref();
         const nome = ref("");
         const telefone = ref("");
         const headers = [
@@ -237,25 +242,30 @@
         function deletaContato(removeContato) {
           const index = contatos.value.findIndex(
             (item) =>
-              item.nome === removeContato.nome && item.telefone === removeContato.telefone
+              item.nome === removeContato.nome &&
+              item.telefone === removeContato.telefone
           );
           if (index !== -1) {
-            contatos.value.splice(index, 1)
+            contatos.value.splice(index, 1);
           }
           dialogDelete.value = false;
         }
 
         function editaContato(pessoa) {
           contatoEditado.value = { ...pessoa };
+          const index = contatos.value.findIndex(
+            (contato) =>
+              contato.nome === contatoEditado.value.nome &&
+              contato.telefone === contatoEditado.value.telefone
+          );
+          posicao.value = index;
           dialogEdicao.value = true;
         }
 
-        function salvarContatoEditado(contatoEditado) {
-          const index = contatos.value.findIndex(
-            (contato) =>
-              contato.nome === contatoEditado.nome &&
-              contato.telefone === contatoEditado.telefone
-          );
+        function salvarContatoEditado(contatoEditado, index) {
+          if (index !== -1) {
+            contatos.value[index] = contatoEditado;
+          }
           dialogEdicao.value = false;
         }
 
@@ -269,13 +279,14 @@
           telefone,
           contatoEditado,
           removeContato,
+          posicao,
           adicionarContato,
           validaNome,
           validaTelefone,
           deletaContato,
           editaContato,
           salvarContatoEditado,
-          opcaoContatoDeletar
+          opcaoContatoDeletar,
         };
       },
     })
