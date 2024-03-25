@@ -53,6 +53,7 @@
                         variant="underlined"
                         :color="validaTelefone() ? '' : 'red-darken-1'"
                         :hint="validaTelefone() ? '' : 'Formato de telefone inválido. Use (xx) xxxx-xxxx'"
+                        @keypress="inputNumeros"
                       ></v-text-field>
                     </v-col>
                   </v-row>
@@ -123,6 +124,7 @@
                       <v-text-field
                         v-model="contatoEditado.telefone"
                         label="Telefone"
+                        @keypress="inputNumeros"
                       ></v-text-field>
                     </v-card-text>
                     <v-card-actions>
@@ -268,6 +270,13 @@
           dialogEdicao.value = false;
         }
 
+        function inputNumeros(event) {
+          const charCode = event.keyCode;
+          if(charCode < 48 || charCode > 57) {
+            event.preventDefault();
+          }
+        }
+
         return {
           headers,
           contatos,
@@ -286,6 +295,7 @@
           editaContato,
           salvarContatoEditado,
           opcaoContatoDeletar,
+          inputNumeros,
         };
       },
     })
